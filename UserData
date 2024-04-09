@@ -1,0 +1,73 @@
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class UserDatabaseHelper extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "OpenTracksUser.db";
+    private static final int DATABASE_VERSION = 1;
+
+    
+    private static final String TABLE_USERS = "users";
+    private static final String COLUMN_NICKNAME = "nickname";
+
+
+    
+    private static final String SQL_CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + " (" +
+            COLUMN_NICKNAME + " TEXT PRIMARY KEY, " +
+           
+            ");";
+
+    public UserDatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_CREATE_USERS_TABLE);
+    }
+
+    
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        
+    }
+
+    
+    public boolean addUser(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NICKNAME, user.getNickname());
+       
+
+        long result = db.insert(TABLE_USERS, null, values);
+        return result != -1; 
+    }
+
+
+    public boolean updateUser(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+       
+
+        int rowsAffected = db.update(TABLE_USERS, values, COLUMN_NICKNAME + " = ?", new String[]{user.getNickname()});
+        return rowsAffected > 0; 
+    }
+
+   
+    public User getUser(String nickname) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {COLUMN_EMAIL, COLUMN_NICKNAME};
+        String selection = COLUMN_NICKNAME + " = ?";
+        String[] selectionArgs = {nickname};
+        Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
+        User user = null;
+        if (cursor.moveToFirst()) {
+
+           String nickname = cursor.getString(cursor.getColumnIndex(COLUMN_NICKNAME));
+            
+        }
+        cursor.close();
+        return user;
+    }
+}
